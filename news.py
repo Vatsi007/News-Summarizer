@@ -2,6 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Query
+from fastapi import HTTPException
 from openai import OpenAI
 
 # ---------------- LOAD ENV ----------------
@@ -87,12 +88,49 @@ def home():
     return {"message": "News Retrieval Agent is running 🚀"}
 
 
-@app.get("/summarize")
-def summarize(topic: str = Query(default="Ashes cricket 2025", description="News topic to summarize")):
-    news_text = fetch_news(topic)
-    summary = summarize_news(news_text)
+# @app.get("/summarize")
+# def summarize(topic: str = Query(default="Ashes cricket 2025", description="News topic to summarize")):
+#     news_text = fetch_news(topic)
+#     summary = summarize_news(news_text)
 
-    return {
-        "topic": topic,
-        "summary": summary
-    }
+#     return {
+#         "topic": topic,
+#         "summary": summary
+#     }
+
+
+
+@app.get("/summarize")
+def summarize(
+    topic: str = Query(
+        default="Ashes cricket 2025",
+        description="News topic to summarize"
+    )
+):
+    if not NEWS_API_KEY:
+        raise HTTPException(status_code=500, detail="NEWS_API_KEY not configured")
+
+    if not OPENAI_API_KEY:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+
+    try:
+        news_text = fetch_news(topic)
+
+        if "No news articles found" in news_text:
+            return {
+                "topic": topic,
+                "summary": "No relevant news articles found."
+            }
+
+        summary = summarize_news(news_text)
+
+        return {
+            "topic": topic,
+            "summary": summary
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Summarization failed: {str(e)}"
+        )
