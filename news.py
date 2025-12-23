@@ -88,7 +88,7 @@ def home():
 
 
 @app.get("/summarize")
-def summarize(topic: str = Query(..., description="News topic to summarize")):
+def summarize(topic: str = Query("Ashes cricket 2025", description="News topic to summarize")):
     news_text = fetch_news(topic)
     summary = summarize_news(news_text)
 
