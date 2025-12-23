@@ -24,8 +24,10 @@ def fetch_news(topic: str, limit: int = 5) -> str:
     url = "https://newsapi.org/v2/everything"
     params = {
         "q": topic,
+        "qInTitle": topic,
         "pageSize": limit,
         "language": "en",
+        "sortby":"relevancy",
         "apiKey": NEWS_API_KEY
     }
 
@@ -103,7 +105,7 @@ def home():
 @app.get("/summarize")
 def summarize(
     topic: str = Query(
-        default="Ashes Cricket 2025",
+        default="Ashes Cricket ",
         description="News topic to summarize"
     )
 ):
