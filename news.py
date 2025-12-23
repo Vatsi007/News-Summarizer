@@ -103,7 +103,7 @@ def home():
 @app.get("/summarize")
 def summarize(
     topic: str = Query(
-        default="Ashes cricket 2025",
+        default="Ashes Cricket 2025",
         description="News topic to summarize"
     )
 ):
