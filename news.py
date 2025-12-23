@@ -73,6 +73,13 @@ Summary:
 
     return response.choices[0].message.content
 
+@app.get("/health")
+def health_check():
+    return {
+        "status": "ok",
+        "service": "News Retrieval & Summarization Agent",
+        "version": "1.0"
+    }
 
 # ---------------- ROUTES ----------------
 @app.get("/")
