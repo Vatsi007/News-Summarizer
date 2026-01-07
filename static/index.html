@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>News Summarization Agent</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      padding-top: 50px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    pre {
+      background: #f1f5f9;
+      padding: 10px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>📰 News Summarization Agent</h2>
+
+    <input id="topic" placeholder="Enter news topic (e.g. Tesla)" />
+    <button onclick="summarize()">Summarize</button>
+
+    <p id="loading"></p>
+    <pre id="output"></pre>
+  </div>
+
+  <script>
+    async function summarize() {
+      const topic = document.getElementById("topic").value;
+      const output = document.getElementById("output");
+      const loading = document.getElementById("loading");
+
+      if (!topic) {
+        alert("Please enter a topic");
+        return;
+      }
+
+      loading.innerText = "⏳ Fetching and summarizing news...";
+      output.innerText = "";
+
+      const response = await fetch("/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ topic })
+      });
+
+      const data = await response.json();
+
+      loading.innerText = "";
+      output.innerText = data.summary || "No summary found";
+    }
+  </script>
+
+</body>
+</html>
