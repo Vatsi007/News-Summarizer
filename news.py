@@ -151,34 +151,42 @@ def home():
 
 @app.post("/summarize")
 def summarize(request: SummarizeRequest):
-    if not NEWS_API_KEY:
-        raise HTTPException(status_code=500, detail="NEWS_API_KEY not configured")
+    try:
+        print("➡️ /summarize called")
+        print("Topic:", request.topic)
+        print("Limit:", request.limit)
+        if not NEWS_API_KEY:
+            raise HTTPException(status_code=500, detail="NEWS_API_KEY not configured")
 
-    if not OPENAI_API_KEY:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+        if not OPENAI_API_KEY:
+            raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
 
-    articles = fetch_news(request.topic, request.limit or 5)
+        articles = fetch_news(request.topic, request.limit or 5)
 
-    if not articles:
+        if not articles:
+            return {
+                "topic": request.topic,
+                "summary": "No relevant news articles found."
+            }
+
+        combined_text = ""
+        for i, article in enumerate(articles, start=1):
+            combined_text += f"""
+            Article {i}:
+            Title: {article.get('title')}
+            Description: {article.get('description')}
+            """
+
+        summary = summarize_news(combined_text,topic=request.topic)
+
         return {
             "topic": request.topic,
-            "summary": "No relevant news articles found."
+            "summary": summary
         }
 
-    combined_text = ""
-    for i, article in enumerate(articles, start=1):
-        combined_text += f"""
-        Article {i}:
-        Title: {article.get('title')}
-        Description: {article.get('description')}
-        """
-
-    summary = summarize_news(combined_text,topic=request.topic)
-
-    return {
-        "topic": request.topic,
-        "summary": summary
-    }
+    except Exception as e:
+        print("🔥 FATAL ERROR:", repr(e))   # THIS LINE IS CRITICAL
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 
